@@ -1,4 +1,15 @@
-﻿function ShowImagePreview(imageUploader, previewImage) {
+﻿$(function () {
+    $("#loaderBody").addClass('hide');
+
+    $(document).bind('ajaxStart', function () {
+        $("#loaderBody").removeClass('hide');
+    }).bind('ajaxStop', function () {
+        $("#loaderBody").addClass('hide');
+    });
+});
+
+
+function ShowImagePreview(imageUploader, previewImage) {
     if (imageUploader.files && imageUploader.files[0]) {
         var reader = new FileReader();
         reader.onload = function (e) {
@@ -22,6 +33,9 @@ function UserManagementPost()
                     refreshAndNewTab($(form).attr('reset-Url'), true);
                     // Implement Success message
                     $.notify(response.message, "success");
+
+                    if (typeof activateJQueryTable !== 'undefined' && $.isFunction(activateJQueryTable))
+                        activateJQueryTable();
                 }
                 else {
                     // TODO: Implement Error Message
@@ -53,4 +67,42 @@ function refreshAndNewTab(resetURL, showViewTab)
             }
         }
     });
+}
+
+function Edit(Url) {
+    $.ajax({
+        type: 'GET',
+        url: Url,
+        success: function (response) {
+            $("#seconTab").html(response);
+            $('ul.nav.nav-tabs a:eq(1)').html('Edit');
+            $('ul.nav.nav-tabs a:eq(1)').tab('show');
+
+        }
+    });
+}
+
+function Delete(Url) {
+    if (confirm('Confirm the removal of this record?') === true)
+    {
+        $.ajax({
+            type: 'POST',
+            url: Url,
+            success: function (response) {
+
+                if (response.success) {
+                    $("#firstTab").html(response.html);
+                    $.notify(response.message, "warn");
+                    if (typeof activateJQueryTable !== 'undefined' && $.isFunction(activateJQueryTable))
+                        activateJQueryTable();
+                }
+                else {
+                    $.notify(response.message, "error");
+                }
+                $("#seconTab").html(response);
+                $('ul.nav.nav-tabs a:eq(1)').html('Edit');
+                $('ul.nav.nav-tabs a:eq(1)').tab('show');
+            }
+        });
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -33,6 +34,14 @@ namespace UserManagementCenter.Controllers
         public ActionResult AddOrEdit(int id = 0)
         {
             User usr = new User();
+
+            if(id != 0)
+            {
+                using(DBModel db = new DBModel())
+                {
+                    usr = db.Users.Where(i => i.UserID == id).FirstOrDefault<User>();
+                }
+            }
             return View(usr);
         }
 
@@ -52,14 +61,43 @@ namespace UserManagementCenter.Controllers
 
                 using (DBModel db = new DBModel())
                 {
-                    db.Users.Add(usr);
-                    db.SaveChanges();
+                    if(usr.UserID == 0)
+                    {
+                        db.Users.Add(usr);
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        db.Entry(usr).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                    
                 }
                 return Json(new { success = true, html = GlobalClass.RenderRazorViewToString(this, "ViewAll", GetAllUsers()), message = "Submitted Successfully" }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
                 return Json(new {success = false, message = ex.Message}, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        public ActionResult Delete(int id)
+        {
+            try
+            {
+                using(DBModel db = new DBModel())
+                {
+                    User usr = db.Users.Where(x => x.UserID == id).FirstOrDefault<User>();
+
+                    db.Users.Remove(usr);
+                    db.SaveChanges();
+                }
+                return Json(new { success = true, html = GlobalClass.RenderRazorViewToString(this, "ViewAll", GetAllUsers()), message = "Record Successfully Removed" }, JsonRequestBehavior.AllowGet);
+            }
+            catch(Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message}, JsonRequestBehavior.AllowGet);
             }
         }
     }
