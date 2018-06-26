@@ -5,7 +5,7 @@
 }
 
 <!--This data will be submitted to the AddOrEdit() post method in the User Controller-->
-@using (Html.BeginForm("AddOrEdit", "User", FormMethod.Post, new { enctype = "multipart/form-data", onSubmit = "return userManagementPost(this);" }))
+@using (Html.BeginForm("AddOrEdit", "User", FormMethod.Post, new { enctype = "multipart/form-data", onSubmit = "return userManagementPost(this);", reset_Url = Url.Action("AddOREdit", "User", new { id = 0}) }))
 {
     @Html.AntiForgeryToken()
 <div class="row">

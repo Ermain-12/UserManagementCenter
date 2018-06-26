@@ -17,9 +17,18 @@ function UserManagementPost()
             url: form.action,
             data: new FormData(form),
             success: function (response) {
-                $("firstTab").html(response);
+                if (response.success) {
+                    $("firstTab").html(html);
+                    refreshAndNewTab($(form).attr('reset-Url'), true);
+                    // Implement Success message
+                    $.notify(response.message, "success");
+                }
+                else {
+                    // TODO: Implement Error Message
+                    $.notify(response.message, "error");
+                }
             }
-        }
+        };
 
         if (form.attr('enctype') === 'multipart/form-data') {
             ajaxConfig["contentType"] = false;
@@ -28,4 +37,20 @@ function UserManagementPost()
         $.ajax();
     }
     return false;
+}
+
+
+function refreshAndNewTab(resetURL, showViewTab)
+{
+    $.ajax({
+        type: 'GET',
+        url: resetURL,
+        success: function (response) {
+            $("#secondTab").html(response);
+            $('ul.nav.nav-tabs a:eq(1)').html('Add New');
+            if (showViewTab) {
+                $('ul.nav.nav-tabs a:eq(0)').tab('show');
+            }
+        }
+    });
 }

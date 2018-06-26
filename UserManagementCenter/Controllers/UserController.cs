@@ -39,21 +39,28 @@ namespace UserManagementCenter.Controllers
         [HttpPost]
         public ActionResult AddOrEdit(User usr)
         {
-            if (usr.ImageUpload != null)
+            try
             {
-                string fileName = Path.GetFileNameWithoutExtension(usr.ImageUpload.FileName);
-                string extension = Path.GetExtension(usr.ImageUpload.FileName);
-                fileName = fileName + DateTime.Now.ToString("yymssfff") + extension;
-                usr.ImagePath = "~/AppFiles/Images/" + fileName;
-                usr.ImageUpload.SaveAs(Path.Combine(Server.MapPath("~/AppFiles/Images/"), fileName));
-            }
+                if (usr.ImageUpload != null)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(usr.ImageUpload.FileName);
+                    string extension = Path.GetExtension(usr.ImageUpload.FileName);
+                    fileName = fileName + DateTime.Now.ToString("yymssfff") + extension;
+                    usr.ImagePath = "~/AppFiles/Images/" + fileName;
+                    usr.ImageUpload.SaveAs(Path.Combine(Server.MapPath("~/AppFiles/Images/"), fileName));
+                }
 
-            using(DBModel db = new DBModel())
-            {
-                db.Users.Add(usr);
-                db.SaveChanges();
+                using (DBModel db = new DBModel())
+                {
+                    db.Users.Add(usr);
+                    db.SaveChanges();
+                }
+                return Json(new { success = true, html = GlobalClass.RenderRazorViewToString(this, "ViewAll", GetAllUsers()), message = "Submitted Successfully" }, JsonRequestBehavior.AllowGet);
             }
-            return RedirectToAction("ViewAll");
+            catch (Exception ex)
+            {
+                return Json(new {success = false, message = ex.Message}, JsonRequestBehavior.AllowGet);
+            }
         }
     }
 }
