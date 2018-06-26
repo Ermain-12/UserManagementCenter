@@ -4,8 +4,8 @@
     ViewBag.Title = "AddOrEdit";
 }
 
-
-@using (Html.BeginForm())
+<!--This data will be submitted to the AddOrEdit() post method in the User Controller-->
+@using (Html.BeginForm("AddOrEdit", "User", FormMethod.Post, new { enctype = "multipart/form-data", onSubmit = "return userManagementPost(this);" }))
 {
     @Html.AntiForgeryToken()
 <div class="row">
@@ -14,6 +14,8 @@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.UserID)
+        @Html.HiddenFor(model => model.ImagePath)
+
         <div class="col-md-6">
             <div class="form-group">
                 @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })

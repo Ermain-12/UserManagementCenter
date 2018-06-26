@@ -12,18 +12,21 @@ namespace UserManagementCenter.Models
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Web;
 
     public partial class User
     {
         public int UserID { get; set; }
+
+        [Required(ErrorMessage ="This Field is required")]
         public string Name { get; set; }
         public string Position { get; set; }
         public string Office { get; set; }
         public Nullable<int> Salary { get; set; }
 
-        [DisplayName("Name")]
+        [DisplayName("Image")]
         public string ImagePath { get; set; }
 
         [NotMapped]

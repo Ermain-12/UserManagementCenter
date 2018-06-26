@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -36,9 +37,23 @@ namespace UserManagementCenter.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddOrEdit()
+        public ActionResult AddOrEdit(User usr)
         {
-            return View();
+            if (usr.ImageUpload != null)
+            {
+                string fileName = Path.GetFileNameWithoutExtension(usr.ImageUpload.FileName);
+                string extension = Path.GetExtension(usr.ImageUpload.FileName);
+                fileName = fileName + DateTime.Now.ToString("yymssfff") + extension;
+                usr.ImagePath = "~/AppFiles/Images/" + fileName;
+                usr.ImageUpload.SaveAs(Path.Combine(Server.MapPath("~/AppFiles/Images/"), fileName));
+            }
+
+            using(DBModel db = new DBModel())
+            {
+                db.Users.Add(usr);
+                db.SaveChanges();
+            }
+            return RedirectToAction("ViewAll");
         }
     }
 }
